@@ -1,4 +1,6 @@
 HOME = /home/$(USER)
+
+OLD_MODULE_NAME := github.com/andikaraditya/go-backend-starter-template
 PORT ?= 3000
 
 run-api: kill-api
@@ -36,3 +38,17 @@ force-version:
 		exit 1; \
 	fi
 	migrate -database "$$DSN_MIGRATE" -path db/migrations force $(version)
+
+update-imports:
+	clear
+	@if [ -z "$(module)" ]; then \
+		echo "Usage: make update-imports module=<module_name>"; \
+		exit 1; \
+	fi
+	@echo "Updating imports from $(OLD_MODULE_NAME) to $(module)..."
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		find . -type f -name "*.go" -exec sed -i '' 's|$(OLD_MODULE_NAME)|$(module)|g' {} +; \
+	else \
+		find . -type f -name "*.go" -exec sed -i 's|$(OLD_MODULE_NAME)|$(module)|g' {} +; \
+	fi
+	@echo "Import updates completed."
