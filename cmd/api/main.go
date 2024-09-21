@@ -26,5 +26,12 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
+
+	app.Get("/status", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"status": true,
+		})
+	})
+
 	app.Listen(":3000")
 }
