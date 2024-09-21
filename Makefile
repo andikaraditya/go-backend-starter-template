@@ -1,9 +1,15 @@
 HOME = /home/$(USER)
+PORT ?= 3000
 
-run-api:
+run-api: kill-api
 	clear
 	@echo "Run development environment..."
 	go run cmd/api/main.go cmd/api/config.go
+
+kill-api:
+	clear
+	@echo "Kill api..."
+	kill -9 $$(lsof -t -i:$(PORT)) || true
 
 create-migration:
 	clear

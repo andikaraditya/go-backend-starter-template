@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -43,5 +44,5 @@ func main() {
 		SigningKey: jwtware.SigningKey{Key: []byte(cfg.JWTSecret)},
 	}))
 
-	app.Listen(fmt.Sprintf(":%d", cfg.Port))
+	log.Fatal().Err(app.Listen(fmt.Sprintf(":%d", cfg.Port))).Msg("Server has crashed")
 }

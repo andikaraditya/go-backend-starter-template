@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -28,4 +29,18 @@ func GetUserId(c *fiber.Ctx) string {
 	user := c.Locals("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	return claims["user_id"].(string)
+}
+
+func SendError(ctx *fiber.Ctx, statusCode int, errMsg string, err error) error {
+	log.Error().
+		Str("method", ctx.Method()).
+		Str("path", ctx.Path()).
+		Err(err).
+		Str("msg", errMsg).
+		Msg("")
+
+	return ctx.Status(statusCode).JSON(fiber.Map{
+		"status_code": statusCode,
+		"message":     errMsg,
+	})
 }

@@ -14,12 +14,16 @@ func CreateUser(ctx *fiber.Ctx) error {
 		return err
 	}
 
+	if err := req.Validate(); err != nil {
+		return api.SendError(ctx, 400, err.Error(), err)
+	}
+
 	err := Service.CreateUser(*req)
 	if err != nil {
 		if errors.Is(err, api.ErrPayload) {
-			return ctx.Status(400).SendString("email already exists")
+			return api.SendError(ctx, 400, "user already exists", err)
 		}
-		return ctx.Status(500).SendString("internal server error")
+		return api.SendError(ctx, 500, "internal server error", err)
 	}
 	return ctx.Status(200).JSON(fiber.Map{
 		"status": "ok",
@@ -32,13 +36,16 @@ func Login(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	token, err := Service.Login(*req)
+	if err := req.Validate(); err != nil {
+		return api.SendError(ctx, 400, err.Error(), err)
+	}
 
+	token, err := Service.Login(*req)
 	if err != nil {
 		if errors.Is(err, api.ErrPayload) {
-			return ctx.Status(400).SendString("incorrect password or email")
+			return api.SendError(ctx, 400, "email or password is incorrect", err)
 		}
-		return ctx.Status(500).SendString("internal server error")
+		return api.SendError(ctx, 500, "internal server error", err)
 	}
 	return ctx.Status(200).JSON(fiber.Map{
 		"token": token,

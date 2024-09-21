@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"strings"
+	"errors"
 	"time"
 
 	"github.com/andikaraditya/go-backend-starter-template/internal/api"
@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type UserService interface {
@@ -61,8 +62,11 @@ func (s *srv) CreateUser(user User) error {
 		)
 
 		if err != nil {
-			if strings.Contains(err.Error(), "23505") {
-				return api.ErrPayload
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) {
+				if pgErr.Code == "42P05" {
+					return api.ErrPayload
+				}
 			}
 			return err
 		}
